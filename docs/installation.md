@@ -4,22 +4,36 @@
 The following instructions are for setting up a version of Amundsen using Docker.
 
 1. Make sure you have at least 3GB available to docker. Install `docker` and  `docker-compose`.
+
 2. Clone [this repo](https://github.com/amundsen-io/amundsen) and its submodules by running:
+
    ```bash
    $ git clone --recursive git@github.com:amundsen-io/amundsen.git
    ```
+   
 3. Enter the cloned directory and run:
+
     ```bash
+   
     # For Neo4j Backend
     $ docker-compose -f docker-amundsen.yml up
 
     # For Atlas
     $ docker-compose -f docker-amundsen-atlas.yml up
     ```
+    
+   NOTE: The Elastic Search docker container may not have enough heap memory which may result in `es_amundsen` failing during `docker-compose`. If you see the following docker-compose error: `es_amundsen | [1]: max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`, increase th  heap memory [detailed instructions here](https://www.elastic.co/guide/en/elasticsearch/reference/7.1/docker.html#docker-cli-run-prod-mode)
+
+   1. Edit `/etc/sysctl.conf`
+   2. Make entry `vm.max_map_count=262144`. Save and exit.
+   3. Reload settings `$ sysctl -p`
+   4. Restart `docker-compose`
+
 4. Ingest provided sample data into Neo4j by doing the following: _(Please skip if you are using Atlas backend)_
 
    * In a separate terminal window, change directory to the [amundsendatabuilder](https://github.com/amundsen-io/amundsendatabuilder) submodule.
    * `sample_data_loader` python script included in `examples/` directory uses _elasticsearch client_, _pyhocon_ and other libraries. Install the dependencies in a virtual env and run the script by following the commands below:
+   
    ```bash
     $ python3 -m venv venv
     $ source venv/bin/activate
@@ -28,6 +42,7 @@ The following instructions are for setting up a version of Amundsen using Docker
     $ python3 setup.py install
     $ python3 example/scripts/sample_data_loader.py
    ```
+   
 5. View UI at [`http://localhost:5000`](http://localhost:5000) and try to search `test`, it should return some result.
 ![](img/search-page.png)
 
